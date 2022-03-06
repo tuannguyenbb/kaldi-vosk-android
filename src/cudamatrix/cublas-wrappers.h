@@ -33,7 +33,7 @@ inline cublasStatus_t cublas_gemm(
     cublasOperation_t transb, int m, int n,int k, float alpha,
     const float *A, int lda, const float *B, int ldb, float beta,
     float *C, int ldc) {
-#if CUDA_VERSION >= 11000
+#if 0
   return cublasGemmEx(handle,transa,transb,m,n,k,&alpha,A,CUDA_R_32F,lda,B,CUDA_R_32F,ldb,&beta,
                       C,CUDA_R_32F,ldc,CuDevice::Instantiate().GetCublasComputeType(),
                       CuDevice::Instantiate().GetCublasGemmAlgo());
@@ -62,7 +62,7 @@ inline cublasStatus_t cublas_gemmBatched(
     cublasOperation_t transb, int m, int n, int k, float alpha,
     const float *A[], int lda, const float *B[], int ldb, float beta,
     float *C[], int ldc, int batchCount) {
-#if CUDA_VERSION >= 11000
+#if 0
   return cublasGemmBatchedEx(handle, transa, transb, m, n, k, &alpha, (const void**)A, CUDA_R_32F,  lda,
                              (const void**)B, CUDA_R_32F, ldb, &beta, (void**)C, CUDA_R_32F, ldc, batchCount,
                              CuDevice::Instantiate().GetCublasComputeType(), CuDevice::Instantiate().GetCublasGemmAlgo());

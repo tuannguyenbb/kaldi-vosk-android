@@ -318,11 +318,19 @@ void BatchedIvectorExtractorCuda::ComputeIvectorStats(
   int32_t ldc = X_.Stride();
   int32_t strideC = ldc * num_gauss_;
 
+#if 0
   // multiplying X = post * feats
   CUBLAS_SAFE_CALL(cublasGemmStridedBatchedEx(
       GetCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_T, m, n, k, &alpha, A,
       CUDA_R_32F, lda, strideA, B, CUDA_R_32F, ldb, strideB, &beta, C,
       CUDA_R_32F, ldc, strideC, num_lanes, CUDA_R_32F, CUBLAS_GEMM_DEFAULT))
+#else
+  CUBLAS_SAFE_CALL(cublasSgemmStridedBatched(
+      GetCublasHandle(), CUBLAS_OP_N, CUBLAS_OP_T, m, n, k, &alpha, A,
+      lda, strideA, B, ldb, strideB, &beta, C,
+      ldc, strideC, num_lanes))
+#endif
+
 #endif
 
   apply_and_update_stash(
