@@ -82,21 +82,9 @@ if ! have libtoolize && ! have glibtoolize; then
   add_packages libtool
 fi
 
-if ! have svn; then
-  echo "$0: subversion is not installed"
-  add_packages subversion
-fi
-
 if ! have awk; then
   echo "$0: awk is not installed"
   add_packages gawk
-fi
-
-pythonok=true
-if ! have python2.7; then
-  echo "$0: python2.7 is not installed"
-  add_packages python27 python2.7
-  pythonok=false
 fi
 
 if ! have python3; then
