@@ -71,7 +71,7 @@ kaldi.mk:
 
 checkversion: | kaldi.mk
 ifeq ($(shell ./configure --version),$(CONFIGURE_VERSION))
-	@echo "The version of configure script matches kaldi.mk version. Good."
+	@echo "The version of configure script matches kaldi.mk version. Good: $(KALDI_FLAVOR)"
 else
 	@echo "ERROR: The kaldi.mk file was generated using a different" \
 	      "version of configure script. Please run ./configure again."
@@ -86,22 +86,32 @@ endif
 biglib: $(SUBDIRS_LIB)
 ifeq ($(KALDI_FLAVOR), dynamic)
 ifeq ($(shell uname), Darwin)
-	$(CXX) -dynamiclib -o $(KALDILIBDIR)/libkaldi.dylib -install_name @rpath/libkaldi.dylib -framework Accelerate $(LDFLAGS) $(wildcard $(SUBDIRS_LIB:=/*.dylib))
+	$(CXX) -shared -o $(KALDILIBDIR)/libkaldi.dylib -install_name @rpath/libkaldi.dylib -framework Accelerate $(LDFLAGS) $(wildcard $(SUBDIRS_LIB:=/*.dylib))
+#	$(CXX) -shared -undefined dynamic_lookup -o $(KALDILIBDIR)/libkaldi.dylib -install_name @rpath/libkaldi.dylib -framework Accelerate $(LDFLAGS) $(wildcard $(SUBDIRS_LIB:=/*.dylib))
+#    $(CXX) -dynamiclib -o $(KALDILIBDIR)/libkaldi.dylib -install_name @rpath/libkaldi.dylib -framework Accelerate $(LDFLAGS) $(wildcard $(SUBDIRS_LIB:=/*.dylib))
+	@echo "Darwin platform detected !!!! ~~~~~~~~~"
 else
 ifeq ($(shell uname), Linux)
 #	$(warning the following command will probably fail, in that case add -fPIC to your CXXFLAGS and remake all)
 	$(CXX) -shared -o $(KALDILIBDIR)/$(KALDI_SONAME) -Wl,-soname=$(KALDI_SONAME),--whole-archive  $(wildcard $(SUBDIRS_LIB:=/kaldi-*.a)) -Wl,--no-whole-archive  $(LDLIBS)
+	@echo "Linux platform detected !!!! ~~~~~~~~~"
 else
 	$(error Dynamic libraries not supported on this platform. Run configure with --static flag. )
+	@echo "Unrecognized platform detected: $(shell uname)"
 endif
 endif
+else
+    @echo "Unrecognized KALDI_FLAVOR: $(KALDI_FLAVOR)"
 endif
+
 
 .PHONY: biglibext
 biglibext: $(EXT_SUBDIRS_LIB)
 ifeq ($(KALDI_FLAVOR), dynamic)
 ifeq ($(shell uname), Darwin)
-	$(CXX) -dynamiclib -o $(KALDILIBDIR)/libkaldi_ext.dylib -install_name @rpath/libkaldi_ext.dylib -framework Accelerate $(LDFLAGS) $(EXT_SUBDIRS_LIB:=/*.dylib)
+	$(CXX) -shared -o $(KALDILIBDIR)/libkaldi_ext.dylib -install_name @rpath/libkaldi_ext.dylib -framework Accelerate $(LDFLAGS) $(EXT_SUBDIRS_LIB:=/*.dylib)
+#	$(CXX) -shared -undefined dynamic_lookup -o $(KALDILIBDIR)/libkaldi_ext.dylib -install_name @rpath/libkaldi_ext.dylib -framework Accelerate $(LDFLAGS) $(EXT_SUBDIRS_LIB:=/*.dylib)
+#    $(CXX) -dynamiclib -o $(KALDILIBDIR)/libkaldi_ext.dylib -install_name @rpath/libkaldi_ext.dylib -framework Accelerate $(LDFLAGS) $(EXT_SUBDIRS_LIB:=/*.dylib)
 else
 ifeq ($(shell uname), Linux)
 #	$(warning The following command will probably fail, in that case add -fPIC to your CXXFLAGS and remake all.)

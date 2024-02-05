@@ -57,7 +57,8 @@ ifeq ($(KALDI_FLAVOR), dynamic)
 # the LIBFILE is not the same as $(LIBNAME).a
 $(LIBFILE): $(LIBNAME).a
   ifeq ($(shell uname), Darwin)
-	$(CXX) -dynamiclib -o $@ -install_name @rpath/$@ $(LDFLAGS) $(OBJFILES) $(LDLIBS)
+#	$(CXX) -dynamiclib -o $@ -install_name @rpath/$@ $(LDFLAGS) $(OBJFILES) $(LDLIBS)
+	$(CXX) -shared -undefined dynamic_lookup -o $@ -install_name @rpath/$@ $(LDFLAGS) $(OBJFILES) $(LDLIBS)
 	ln -sf $(shell pwd)/$@ $(KALDILIBDIR)/$@
   else ifeq ($(shell uname), Linux)
         # Building shared library from static (static was compiled with -fPIC)
